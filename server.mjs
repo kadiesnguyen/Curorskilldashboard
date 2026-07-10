@@ -28,6 +28,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PUBLIC_DIR = path.join(__dirname, 'public')
 const PORT = Number(process.env.CUROR_SKILL_DASHBOARD_PORT || process.env.RULE_PORTAL_PORT || 3847)
+const HOST = process.env.HOST || '127.0.0.1'
 
 function send(res, status, data) {
   const body = JSON.stringify(data)
@@ -321,7 +322,8 @@ const server = http.createServer(async (req, res) => {
   }
 })
 
-server.listen(PORT, '127.0.0.1', () => {
+server.listen(PORT, HOST, () => {
   loadStore()
-  console.log(`CurorSkillDashboard → http://127.0.0.1:${PORT}`)
+  const label = HOST === '0.0.0.0' ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`
+  console.log(`CurorSkillDashboard → ${label}`)
 })

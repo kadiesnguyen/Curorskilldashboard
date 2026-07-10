@@ -1,0 +1,35 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.13.4
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  dashboard:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-3847}:3847"
+    environment:
+      HOST: 0.0.0.0
+      CUROR_SKILL_DASHBOARD_PORT: 3847
+      MEM0_USER_ID: ${MEM0_USER_ID:-default}
+      MEM0_QDRANT_HOST: qdrant
+      MEM0_QDRANT_PORT: 6333
+      MEM0_COLLECTION: ${MEM0_COLLECTION:-mem0}
+      USE_DOCKER_STORE: "1"
+    volumes:
+      # Persist rules/skills/memories config
+      - ./data:/app/data
+      # Sync rules & skills to host Cursor folders
+      - ${CURSOR_HOME:-${HOME}/.cursor}:/root/.cursor
+      - ${AGENTS_HOME:-${HOME}/.agents}:/root/.agents
+      # Scan & sync project repos (read/write for .cursor/rules + .cursor/skills)
+      - ${PROJECTS_ROOT:-${HOME}/Documents/GitHub}:/projects
+    depends_on:
+      - qdrant
+
+volumes:
+  qdrant_data:

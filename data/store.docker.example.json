@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "projectRoots": ["/projects"],
+  "skillRoots": [
+    "/root/.cursor/skills",
+    "/root/.cursor/skills-cursor",
+    "/root/.agents/skills"
+  ],
+  "mem0": {
+    "userId": "default",
+    "qdrantHost": "qdrant",
+    "qdrantPort": 6333,
+    "collection": "mem0"
+  },
+  "projects": [],
+  "rules": [],
+  "skills": []
+}
