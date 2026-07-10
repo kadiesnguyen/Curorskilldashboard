@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CurorSkillDashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">◇</span>
+        <div>
+          <strong>CurorSkill</strong>
+          <small>Rules · Skills · Mem0</small>
+        </div>
+      </div>
+      <nav>
+        <button class="nav active" data-view="dashboard">Tổng quan</button>
+        <button class="nav" data-view="rules">Rules</button>
+        <button class="nav" data-view="skills">Skills</button>
+        <button class="nav" data-view="memories">Memories</button>
+        <button class="nav" data-view="projects">Projects</button>
+        <button class="nav" data-view="settings">Cài đặt</button>
+      </nav>
+      <div class="sidebar-foot">
+        <button id="btn-sync-all" class="btn primary block">Đồng bộ tất cả</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h1 id="view-title">Tổng quan</h1>
+        <div class="topbar-actions">
+          <button id="btn-new-rule" class="btn">+ Rule mới</button>
+          <button id="btn-new-skill" class="btn hidden">+ Skill mới</button>
+          <button id="btn-scan" class="btn ghost">Quét projects</button>
+          <button id="btn-scan-skills" class="btn ghost hidden">Quét skills</button>
+          <button id="btn-refresh-memories" class="btn ghost hidden">Làm mới</button>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view active">
+        <div class="stats stats-5">
+          <div class="stat"><span id="stat-rules">0</span><label>Rules</label></div>
+          <div class="stat"><span id="stat-skills">0</span><label>Skills</label></div>
+          <div class="stat"><span id="stat-memories">—</span><label>Memories</label></div>
+          <div class="stat"><span id="stat-projects">0</span><label>Projects</label></div>
+          <div class="stat"><span id="stat-global">0</span><label>Global</label></div>
+        </div>
+        <div class="card">
+          <h2>Preset templates — 1 click</h2>
+          <p class="muted">Tạo rule chuẩn theo loại project, gán projects gợi ý, đồng bộ ngay.</p>
+          <div id="preset-grid" class="preset-grid"></div>
+        </div>
+        <div class="card">
+          <h2>Hướng dẫn nhanh</h2>
+          <ol>
+            <li>Tạo hoặc sửa <strong>Rules</strong> / <strong>Skills</strong></li>
+            <li>Chọn <strong>Global</strong> hoặc tick từng <strong>Project</strong> / thư mục skill</li>
+            <li><strong>Memories</strong> — xem/ghi mem0 local (Qdrant)</li>
+            <li>Bấm <strong>Đồng bộ</strong> → ghi rules/skills ra disk</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h2>Rules gần đây</h2>
+          <div id="recent-rules" class="list"></div>
+        </div>
+        <div class="card">
+          <h2>Skills gần đây</h2>
+          <div id="recent-skills" class="list"></div>
+        </div>
+      </section>
+
+      <section id="view-rules" class="view">
+        <div class="card compact">
+          <h2>Templates</h2>
+          <div id="preset-grid-rules" class="preset-grid"></div>
+        </div>
+        <div class="split">
+          <div class="list-panel">
+            <div id="rules-list" class="list"></div>
+          </div>
+          <div class="editor-panel">
+            <form id="rule-form" class="card form">
+              <div class="form-row">
+                <label>ID / filename</label>
+                <input id="rule-id" placeholder="layout-standards" required />
+                <input id="rule-filename" placeholder="layout-standards.mdc" />
+              </div>
+              <div class="form-row">
+                <label>Mô tả (description)</label>
+                <input id="rule-description" placeholder="Cross-project layout standards" />
+              </div>
+              <div class="form-row inline">
+                <label><input type="checkbox" id="rule-always" checked /> alwaysApply</label>
+                <label>Globs <input id="rule-globs" placeholder="**/*.tsx" /></label>
+              </div>
+              <div class="form-row">
+                <label>Phạm vi</label>
+                <label class="chip"><input type="checkbox" id="assign-global" /> Global (mọi project)</label>
+                <div id="assign-projects" class="assign-grid"></div>
+              </div>
+              <div class="form-row">
+                <label>Nội dung rule (markdown)</label>
+                <textarea id="rule-body" rows="16" placeholder="# Tiêu đề rule&#10;&#10;Nội dung..."></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn primary">Lưu</button>
+                <button type="button" id="btn-sync-rule" class="btn">Lưu + Đồng bộ</button>
+                <button type="button" id="btn-delete-rule" class="btn danger">Xóa</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-skills" class="view">
+        <div class="card">
+          <h2>Thư mục chứa skills</h2>
+          <p class="muted">Thêm đường dẫn thư mục gốc (mỗi skill là <code>&lt;root&gt;/&lt;name&gt;/SKILL.md</code>)</p>
+          <div class="form-row inline">
+            <input id="add-skill-root-path" placeholder="/home/.../.cursor/skills-cursor" style="flex:1" />
+            <button id="btn-add-skill-root" class="btn">Thêm</button>
+          </div>
+          <div id="skill-roots-list" class="list compact-list"></div>
+        </div>
+        <div class="split">
+          <div class="list-panel">
+            <div id="skills-list" class="list"></div>
+          </div>
+          <div class="editor-panel">
+            <form id="skill-form" class="card form">
+              <div class="form-row">
+                <label>ID / folder name</label>
+                <input id="skill-id" placeholder="my-skill" required />
+                <input id="skill-name" placeholder="my-skill (name trong front matter)" />
+              </div>
+              <div class="form-row">
+                <label>Mô tả (description — khi nào agent dùng skill)</label>
+                <textarea id="skill-description" rows="2" placeholder="Use when ..."></textarea>
+              </div>
+              <div class="form-row">
+                <label>Phạm vi</label>
+                <label class="chip"><input type="checkbox" id="skill-assign-global" /> Global (~/.cursor/skills/)</label>
+                <div class="assign-section">
+                  <small class="muted">Projects</small>
+                  <div id="skill-assign-projects" class="assign-grid"></div>
+                </div>
+                <div class="assign-section">
+                  <small class="muted">Thư mục skill tùy chỉnh</small>
+                  <div id="skill-assign-roots" class="assign-grid"></div>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>Nội dung skill (markdown)</label>
+                <textarea id="skill-body" rows="16" placeholder="# Tiêu đề skill&#10;&#10;Nội dung..."></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn primary">Lưu</button>
+                <button type="button" id="btn-sync-skill" class="btn">Lưu + Đồng bộ</button>
+                <button type="button" id="btn-delete-skill" class="btn danger">Xóa</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-memories" class="view">
+        <div class="card">
+          <div class="mem-toolbar">
+            <input id="memory-search" placeholder="Tìm memory…" />
+            <span id="mem0-status" class="muted">Đang kiểm tra mem0…</span>
+          </div>
+        </div>
+        <div class="split">
+          <div class="list-panel">
+            <div id="memories-list" class="list"></div>
+          </div>
+          <div class="editor-panel">
+            <form id="memory-form" class="card form">
+              <div class="form-row">
+                <label>Memory mới</label>
+                <textarea id="memory-text" rows="8" placeholder="Một fact cụ thể, có path file nếu cần…"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn primary">Thêm memory</button>
+              </div>
+              <p class="muted small">Cần Qdrant + <code>pip install qdrant-client fastembed</code> để thêm từ dashboard. Cursor agent dùng mem0 MCP.</p>
+            </form>
+            <div id="memory-detail" class="card hidden">
+              <h2>Chi tiết</h2>
+              <pre id="memory-detail-text"></pre>
+              <button id="btn-delete-memory" class="btn danger">Xóa memory</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-projects" class="view">
+        <div class="card">
+          <h2>Thêm project thủ công</h2>
+          <div class="form-row inline">
+            <input id="add-project-path" placeholder="/home/.../my-project" style="flex:1" />
+            <button id="btn-add-project" class="btn">Thêm</button>
+          </div>
+        </div>
+        <div id="projects-grid" class="projects-grid"></div>
+      </section>
+
+      <section id="view-settings" class="view">
+        <div class="card form">
+          <h2>Thư mục quét projects</h2>
+          <p class="muted">Mỗi dòng một path (ví dụ <code>~/Documents/GitHub</code>)</p>
+          <textarea id="settings-roots" rows="4"></textarea>
+          <button id="btn-save-settings" class="btn primary">Lưu + Quét lại</button>
+        </div>
+        <div class="card form">
+          <h2>Thư mục skills mặc định</h2>
+          <p class="muted">Mỗi dòng một path gốc chứa skills (quét + đồng bộ)</p>
+          <textarea id="settings-skill-roots" rows="4"></textarea>
+          <button id="btn-save-skill-settings" class="btn primary">Lưu skill roots</button>
+        </div>
+        <div class="card form">
+          <h2>Mem0 (local Qdrant)</h2>
+          <div class="form-row inline mem0-settings">
+            <label>User ID <input id="mem0-user-id" placeholder="default" /></label>
+            <label>Host <input id="mem0-host" placeholder="localhost" /></label>
+            <label>Port <input id="mem0-port" placeholder="6333" /></label>
+            <label>Collection <input id="mem0-collection" placeholder="mem0" /></label>
+          </div>
+          <button id="btn-save-mem0" class="btn primary">Lưu mem0</button>
+        </div>
+      </section>
+
+      <div id="toast" class="toast hidden"></div>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

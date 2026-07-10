@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "projectRoots": ["~/Documents/GitHub"],
+  "skillRoots": [
+    "~/.cursor/skills",
+    "~/.cursor/skills-cursor",
+    "~/.agents/skills"
+  ],
+  "mem0": {
+    "userId": "default",
+    "qdrantHost": "localhost",
+    "qdrantPort": 6333,
+    "collection": "mem0"
+  },
+  "projects": [],
+  "rules": [],
+  "skills": []
+}

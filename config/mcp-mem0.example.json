@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "mem0": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/sanchezvivi/mem0-local-mcp.git",
+        "mem0-local-mcp"
+      ],
+      "env": {
+        "MEM0_USER_ID": "default",
+        "MEM0_QDRANT_HOST": "localhost",
+        "MEM0_QDRANT_PORT": "6333",
+        "MEM0_COLLECTION": "mem0"
+      }
+    }
+  }
+}
