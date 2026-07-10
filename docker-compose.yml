@@ -1,5 +1,6 @@
 services:
   qdrant:
+    profiles: ["bundled-qdrant"]
     image: qdrant/qdrant:v1.13.4
     restart: unless-stopped
     ports:
@@ -9,27 +10,26 @@ services:
 
   dashboard:
     build: .
+    container_name: curorskilldashboard
     restart: unless-stopped
     ports:
       - "${DASHBOARD_PORT:-3847}:3847"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       HOST: 0.0.0.0
+      HOME: ${HOST_HOME}
       CUROR_SKILL_DASHBOARD_PORT: 3847
       MEM0_USER_ID: ${MEM0_USER_ID:-default}
-      MEM0_QDRANT_HOST: qdrant
-      MEM0_QDRANT_PORT: 6333
+      MEM0_QDRANT_HOST: ${MEM0_QDRANT_HOST:-qdrant}
+      MEM0_QDRANT_PORT: ${MEM0_QDRANT_PORT:-6333}
       MEM0_COLLECTION: ${MEM0_COLLECTION:-mem0}
-      USE_DOCKER_STORE: "1"
+      USE_DOCKER_STORE: ${USE_DOCKER_STORE:-0}
     volumes:
-      # Persist rules/skills/memories config
       - ./data:/app/data
-      # Sync rules & skills to host Cursor folders
-      - ${CURSOR_HOME:-${HOME}/.cursor}:/root/.cursor
-      - ${AGENTS_HOME:-${HOME}/.agents}:/root/.agents
-      # Scan & sync project repos (read/write for .cursor/rules + .cursor/skills)
-      - ${PROJECTS_ROOT:-${HOME}/Documents/GitHub}:/projects
-    depends_on:
-      - qdrant
+      - ${HOST_HOME}/.cursor:${HOST_HOME}/.cursor
+      - ${HOST_HOME}/.agents:${HOST_HOME}/.agents
+      - ${PROJECTS_ROOT}:${HOST_HOME}/Documents/GitHub
 
 volumes:
   qdrant_data:
