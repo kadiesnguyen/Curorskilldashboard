@@ -307,7 +307,7 @@ function selectSkill(id) {
   showView('skills')
 }
 
-async function saveSkill(andSync = false) {
+async function saveSkill(andSync = true) {
   const payload = skillFormPayload()
   if (!payload.id) return toast('Nhập ID skill')
   const isEdit = (store.skills || []).some((s) => s.id === payload.id)
@@ -479,7 +479,7 @@ async function refresh() {
   }
 }
 
-async function saveRule(andSync = false) {
+async function saveRule(andSync = true) {
   const payload = formPayload()
   if (!payload.id) return toast('Nhập ID rule')
   const isEdit = store.rules.some((r) => r.id === payload.id)
@@ -507,10 +507,14 @@ $('#btn-new-rule').onclick = () => {
 
 $('#rule-form').onsubmit = (e) => {
   e.preventDefault()
-  saveRule(false)
+  saveRule()
 }
 
-$('#btn-sync-rule').onclick = () => saveRule(true)
+$('#btn-sync-rule').onclick = async () => {
+  if (!selectedRuleId) return toast('Lưu rule trước khi đồng bộ lại')
+  await api(`/api/sync/${encodeURIComponent(selectedRuleId)}`, { method: 'POST' })
+  toast('Đã đồng bộ lại rule')
+}
 
 $('#btn-delete-rule').onclick = async () => {
   if (!selectedRuleId || !confirm(`Xóa rule "${selectedRuleId}"?`)) return
@@ -537,10 +541,14 @@ $('#btn-new-skill').onclick = () => {
 
 $('#skill-form')?.addEventListener('submit', (e) => {
   e.preventDefault()
-  saveSkill(false)
+  saveSkill()
 })
 
-$('#btn-sync-skill').onclick = () => saveSkill(true)
+$('#btn-sync-skill').onclick = async () => {
+  if (!selectedSkillId) return toast('Lưu skill trước khi đồng bộ lại')
+  await api(`/api/sync-skills/${encodeURIComponent(selectedSkillId)}`, { method: 'POST' })
+  toast('Đã đồng bộ lại skill')
+}
 
 $('#btn-delete-skill').onclick = async () => {
   if (!selectedSkillId || !confirm(`Xóa skill "${selectedSkillId}"?`)) return

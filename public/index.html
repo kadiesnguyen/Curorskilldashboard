@@ -60,7 +60,7 @@
             <li>Tạo hoặc sửa <strong>Rules</strong> / <strong>Skills</strong></li>
             <li>Chọn <strong>Global</strong> hoặc tick từng <strong>Project</strong> / thư mục skill</li>
             <li><strong>Memories</strong> — xem/ghi mem0 local (Qdrant)</li>
-            <li>Bấm <strong>Đồng bộ</strong> → ghi rules/skills ra disk</li>
+            <li>Bấm <strong>Lưu</strong> → tự ghi rules/skills ra disk (project/global đã chọn)</li>
           </ol>
         </div>
         <div class="card">
@@ -107,8 +107,8 @@
                 <textarea id="rule-body" rows="16" placeholder="# Tiêu đề rule&#10;&#10;Nội dung..."></textarea>
               </div>
               <div class="form-actions">
-                <button type="submit" class="btn primary">Lưu</button>
-                <button type="button" id="btn-sync-rule" class="btn">Lưu + Đồng bộ</button>
+                <button type="submit" class="btn primary">Lưu + Đồng bộ</button>
+                <button type="button" id="btn-sync-rule" class="btn">Đồng bộ lại</button>
                 <button type="button" id="btn-delete-rule" class="btn danger">Xóa</button>
               </div>
             </form>
@@ -158,8 +158,8 @@
                 <textarea id="skill-body" rows="16" placeholder="# Tiêu đề skill&#10;&#10;Nội dung..."></textarea>
               </div>
               <div class="form-actions">
-                <button type="submit" class="btn primary">Lưu</button>
-                <button type="button" id="btn-sync-skill" class="btn">Lưu + Đồng bộ</button>
+                <button type="submit" class="btn primary">Lưu + Đồng bộ</button>
+                <button type="button" id="btn-sync-skill" class="btn">Đồng bộ lại</button>
                 <button type="button" id="btn-delete-skill" class="btn danger">Xóa</button>
               </div>
             </form>
